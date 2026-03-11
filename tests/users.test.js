@@ -1,15 +1,16 @@
-const request = require("supertest");
-const fs = require("fs");
-
 jest.mock("fs", () => ({
   writeFile: jest.fn(),
 }));
 
+const request = require("supertest");
+
 describe("Users API", () => {
   let server;
+  let fs;
 
   beforeEach(() => {
     jest.resetModules();
+    fs = require("fs");
     fs.writeFile.mockReset();
     server = require("../server");
   });
@@ -46,7 +47,9 @@ describe("Users API", () => {
     });
 
     test("should create a user when all required fields are present", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) => cb(null));
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(null),
+      );
 
       const res = await request(server).post("/users").send({
         id: "test-user-1",
@@ -60,8 +63,8 @@ describe("Users API", () => {
     });
 
     test("should return 500 if file write fails", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) =>
-        cb(new Error("write failed")),
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(new Error("write failed")),
       );
 
       const res = await request(server).post("/users").send({
@@ -86,7 +89,9 @@ describe("Users API", () => {
     });
 
     test("should update an existing user", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) => cb(null));
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(null),
+      );
 
       await request(server).post("/users").send({
         id: "update-user-1",
@@ -112,7 +117,9 @@ describe("Users API", () => {
     });
 
     test("should delete an existing user", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) => cb(null));
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(null),
+      );
 
       await request(server).post("/users").send({
         id: "delete-user-1",

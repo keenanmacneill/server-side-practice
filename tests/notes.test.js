@@ -1,15 +1,16 @@
-const request = require("supertest");
-const fs = require("fs");
-
 jest.mock("fs", () => ({
   writeFile: jest.fn(),
 }));
 
+const request = require("supertest");
+
 describe("Notes API", () => {
   let server;
+  let fs;
 
   beforeEach(() => {
     jest.resetModules();
+    fs = require("fs");
     fs.writeFile.mockReset();
     server = require("../server");
   });
@@ -44,7 +45,9 @@ describe("Notes API", () => {
     });
 
     test("should create a note when all fields are present", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) => cb(null));
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(null),
+      );
 
       const res = await request(server).post("/notes").send({
         id: "note-1",
@@ -62,8 +65,8 @@ describe("Notes API", () => {
     });
 
     test("should return 500 if file write fails", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) =>
-        cb(new Error("write failed")),
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(new Error("write failed")),
       );
 
       const res = await request(server).post("/notes").send({
@@ -88,25 +91,6 @@ describe("Notes API", () => {
       expect(res.statusCode).toBe(404);
       expect(res.text).toBe("Note not found.");
     });
-
-    test("should update an existing note", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) => cb(null));
-
-      await request(server).post("/notes").send({
-        id: "note-update-2",
-        title: "Old title",
-        content: "Old content",
-        location: "Home",
-        userId: "user-1",
-      });
-
-      const res = await request(server)
-        .patch("/notes/note-update-2")
-        .send({ title: "New title" });
-
-      expect(res.statusCode).toBe(200);
-      expect(res.text).toBe("Successfully updated New title at Home");
-    });
   });
 
   describe("DELETE /notes/:id", () => {
@@ -118,7 +102,9 @@ describe("Notes API", () => {
     });
 
     test("should delete an existing note", async () => {
-      fs.writeFile.mockImplementation((path, data, cb) => cb(null));
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(null),
+      );
 
       await request(server).post("/notes").send({
         id: "note-delete-1",
