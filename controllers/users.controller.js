@@ -25,18 +25,18 @@ exports.createUser = (req, res) => {
   });
 };
 
+exports.getAllUsers = (req, res) => {
+  res.status(200).json(users);
+};
+
 exports.getUser = (req, res) => {
-  const targetUser = users.find((u) => u.id === req.params.id);
+  const targetUser = users.find((u) => String(u.id) === req.params.id);
 
   if (!targetUser) {
     return res.status(404).send("User not found.");
   }
 
   return res.status(200).json(targetUser);
-};
-
-exports.getAllUsers = (req, res) => {
-  res.status(200).json(users);
 };
 
 exports.updateUser = (req, res) => {
@@ -47,7 +47,7 @@ exports.updateUser = (req, res) => {
   }
 
   const updatedUsers = users.map((user) =>
-    user.id === id ? { ...user, ...req.body, id: user.id } : user,
+    user.id === req.params.id ? { ...user, ...req.body, id: user.id } : user,
   );
 
   fs.writeFile(filePath, JSON.stringify(updatedUsers, null, 2), (err) => {
@@ -58,9 +58,7 @@ exports.updateUser = (req, res) => {
     users.length = 0;
     users.push(...updatedUsers);
 
-    return res
-      .status(200)
-      .send(`${existingUser.username} has been successfully updated`);
+    return res.status(200).send(`Successfully updated.`);
   });
 };
 

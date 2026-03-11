@@ -30,7 +30,7 @@ exports.getAllNotes = (req, res) => {
 };
 
 exports.getNote = (req, res) => {
-  const targetNote = notes.find((n) => n.id === req.params.id);
+  const targetNote = notes.find((n) => String(n.id) === req.params.id);
 
   if (!targetNote) {
     return res.status(404).send("Note not found.");
@@ -39,6 +39,60 @@ exports.getNote = (req, res) => {
   return res.status(200).json(targetNote);
 };
 
-exports.updateNote = (req, res) => {};
+exports.updateNote = (req, res) => {
+  const existingNote = notes.find((n) => n.id === req.params.id);
 
-exports.deleteNote = (req, res) => {};
+  if (!existingNote) {
+    return res.status(404).send("Note not found.");
+  }
+
+  const updatedNotes = notes.map((n) =>
+    n.id === req.params.id ? { ...n, ...req.body, id: n.id } : n,
+  );
+
+  const updatedNote = updatedNotes.find((n) => n.id === req.params.id);
+
+  fs.writeFile(filePath, JSON.stringify(updatedNotes, null, 2), (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .send(
+          `Failed to update ${existingNote.title} at ${existingNote.location}`,
+        );
+    }
+
+    notes.length = 0;
+    notes.push(...updatedNotes);
+
+    return res
+      .status(200)
+      .send(
+        `Successfully updated ${updatedNote.title} at ${updatedNote.location}`,
+      );
+  });
+};
+
+exports.deleteNote = (req, res) => {
+  const noteToDelete = notes.find((n) => n.id === req.params.id);
+
+  if (!noteToDelete) {
+    return res.status(404).send("Note not found");
+  }
+
+  const updatedNotes = notes.filter((n) => n.id !== req.params.id);
+
+  fs.writeFile(filePath, JSON.stringify(updatedNotes, null, 2), (err) => {
+    if (err) {
+      return res.status(500).send("Internal server error");
+    }
+
+    notes.length = 0;
+    notes.push(...updatedNotes);
+
+    return res
+      .status(200)
+      .send(
+        `'${noteToDelete.title}' at ${noteToDelete.location} was successfully deleted`,
+      );
+  });
+};

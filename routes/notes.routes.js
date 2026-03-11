@@ -9,9 +9,9 @@ const {
   deleteNote,
 } = require("../controllers/notes.controller");
 
+router.post("/", createNote);
 router.get("/", getAllNotes);
 router.get("/:id", getNote);
-router.post("/", createNote);
 router.patch("/:id", updateNote);
 router.delete("/:id", deleteNote);
 
