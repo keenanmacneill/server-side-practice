@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "id": "1",
+    "title": "Key Leader Engagement – Mayor",
+    "content": "Discussed water infrastructure repairs, winter fuel shortages, and NGO coordination requirements.",
+    "location": "Lviv City Hall",
+    "userId": "1"
+  },
+  {
+    "id": "2",
+    "title": "Civil Recon – Hospital",
+    "content": "Regional hospital operating at 80 percent capacity. Shortage of trauma kits and diesel for generators.",
+    "location": "Regional Hospital",
+    "userId": "2"
+  },
+  {
+    "id": "3",
+    "title": "NGO Coordination Meeting",
+    "content": "Met with Red Cross and local relief organizations. Priority needs identified as shelter materials and medical supplies.",
+    "location": "Humanitarian Coordination Center",
+    "userId": "1"
+  },
+  {
+    "id": "4",
+    "title": "Infrastructure Assessment",
+    "content": "Bridge crossing damaged but still passable for light vehicles. Recommend engineer inspection before heavy traffic.",
+    "location": "River Crossing Checkpoint",
+    "userId": "3"
+  },
+  {
+    "id": "5",
+    "title": "Displaced Civilian Support",
+    "content": "Local school converted into temporary shelter. Approximately 120 displaced civilians currently housed.",
+    "location": "Temporary IDP Shelter",
+    "userId": "4"
+  },
+  {
+    "id": "6",
+    "title": "Information Environment Update",
+    "content": "Local population expressing concern about power outages and rising food prices. Monitor for potential unrest indicators.",
+    "location": "Town Market District",
+    "userId": "2"
+  }
+]

@@ -1,58 +1,66 @@
-const fs = require("fs");
 const path = require("path");
-const users = require("../data/usersData.json");
+const fs = require("fs");
 
-const userFilePath = path.join(__dirname, "../data/usersData.json");
+const filePath = path.join(__dirname, "../data/usersData.json");
+const users = require(filePath);
 
 exports.createUser = (req, res) => {
-  const newUser = req.body;
+  const { id, username, passwordHash } = req.body;
 
-  if (!newUser.name) {
-    return res.status(400).send("User 'name' field is required.");
+  if (!id || !username || !passwordHash) {
+    return res
+      .status(400)
+      .send("'id', 'username', and 'passwordHash' fields are required.");
   }
 
-  users.push(newUser);
+  users.push(req.body);
 
-  fs.writeFile(userFilePath, JSON.stringify(users, null, 2), (err) => {
+  fs.writeFile(filePath, JSON.stringify(users, null, 2), (err) => {
     if (err) {
       users.pop();
       return res.status(500).send("Failed to save user");
     }
 
-    res.status(200).send(`${newUser.name} has been successfully added`);
+    return res.status(200).send(`${username} has been successfully added`);
   });
 };
 
-exports.getUsers = (req, res) => {
+exports.getUser = (req, res) => {
+  const targetUser = users.find((u) => u.id === req.params.id);
+
+  if (!targetUser) {
+    return res.status(404).send("User not found.");
+  }
+
+  return res.status(200).json(targetUser);
+};
+
+exports.getAllUsers = (req, res) => {
   res.status(200).json(users);
 };
 
 exports.updateUser = (req, res) => {
-  const { id, ...updates } = req.body;
-
-  if (!id) {
-    return res.status(400).send("Must include 'id'.");
-  }
-
-  const existingUser = users.find((user) => user.id === id);
+  const existingUser = users.find((user) => user.id === req.params.id);
 
   if (!existingUser) {
     return res.status(404).send("User not found.");
   }
 
   const updatedUsers = users.map((user) =>
-    user.id === id ? { ...user, ...updates } : user,
+    user.id === id ? { ...user, ...req.body, id: user.id } : user,
   );
 
-  fs.writeFile(userFilePath, JSON.stringify(updatedUsers, null, 2), (err) => {
+  fs.writeFile(filePath, JSON.stringify(updatedUsers, null, 2), (err) => {
     if (err) {
-      return res.status(500).send(`Failed to update ${existingUser.name}`);
+      return res.status(500).send(`Failed to update ${existingUser.username}`);
     }
 
     users.length = 0;
     users.push(...updatedUsers);
 
-    res.status(200).send(`${existingUser.name} has been successfully updated`);
+    return res
+      .status(200)
+      .send(`${existingUser.username} has been successfully updated`);
   });
 };
 
@@ -65,7 +73,7 @@ exports.deleteUser = (req, res) => {
 
   const filteredArray = users.filter((user) => user.id !== req.params.id);
 
-  fs.writeFile(userFilePath, JSON.stringify(filteredArray, null, 2), (err) => {
+  fs.writeFile(filePath, JSON.stringify(filteredArray, null, 2), (err) => {
     if (err) {
       return res.status(500).send("Failed to delete user");
     }
@@ -73,6 +81,8 @@ exports.deleteUser = (req, res) => {
     users.length = 0;
     users.push(...filteredArray);
 
-    res.status(200).send(`${userToDelete.name} has been successfully deleted`);
+    res
+      .status(200)
+      .send(`${userToDelete.username} has been successfully deleted`);
   });
 };
