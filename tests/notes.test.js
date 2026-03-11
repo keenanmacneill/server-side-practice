@@ -91,6 +91,27 @@ describe("Notes API", () => {
       expect(res.statusCode).toBe(404);
       expect(res.text).toBe("Note not found.");
     });
+
+    test("should update an existing note", async () => {
+      fs.writeFile.mockImplementation((filePath, data, callback) =>
+        callback(null),
+      );
+
+      await request(server).post("/notes").send({
+        id: "note-update-1",
+        title: "Old title",
+        content: "Old content",
+        location: "Home",
+        userId: "user-1",
+      });
+
+      const res = await request(server)
+        .patch("/notes/note-update-1")
+        .send({ title: "New title" });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.text).toBe("Successfully updated New title at Home");
+    });
   });
 
   describe("DELETE /notes/:id", () => {

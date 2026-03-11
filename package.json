@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --silent",
+    "test": "jest --silent --runInBand --detectOpenHandles",
     "start": "nodemon index.js"
   },
   "repository": {

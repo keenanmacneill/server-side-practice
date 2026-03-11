@@ -104,7 +104,7 @@ describe("Users API", () => {
         .send({ username: "newname" });
 
       expect(res.statusCode).toBe(200);
-      expect(res.text).toBe("oldname has been successfully updated.");
+      expect(res.text).toBe("Successfully updated.");
     });
   });
 
