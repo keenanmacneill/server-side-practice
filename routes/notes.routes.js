@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const requireAuth = require("../middleware/requireAuth");
 
 const {
   getNote,
@@ -9,7 +10,7 @@ const {
   deleteNote,
 } = require("../controllers/notes.controller");
 
-router.post("/", createNote);
+router.post("/", requireAuth, createNote);
 router.get("/", getAllNotes);
 router.get("/:id", getNote);
 router.patch("/:id", updateNote);

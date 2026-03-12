@@ -7,7 +7,6 @@ const users = require(filePath);
 
 exports.createUser = async (req, res) => {
   const { id, username, password } = req.body;
-
   if (!id || !username || !password) {
     return res
       .status(400)
@@ -33,7 +32,6 @@ exports.getAllUsers = (req, res) => {
 
 exports.getUser = (req, res) => {
   const targetUser = users.find((u) => String(u.id) === req.params.id);
-
   if (!targetUser) {
     return res.status(404).send("User not found.");
   }
@@ -43,7 +41,6 @@ exports.getUser = (req, res) => {
 
 exports.updateUser = (req, res) => {
   const existingUser = users.find((user) => user.id === req.params.id);
-
   if (!existingUser) {
     return res.status(404).send("User not found.");
   }
@@ -66,7 +63,6 @@ exports.updateUser = (req, res) => {
 
 exports.deleteUser = (req, res) => {
   const userToDelete = users.find((user) => user.id === req.params.id);
-
   if (!userToDelete) {
     return res.status(404).send("User not found");
   }

@@ -6,7 +6,6 @@ const notes = require(filePath);
 
 exports.createNote = (req, res) => {
   const { id, title, content, location, userId } = req.body;
-
   if (!id || !title || !content || !location || !userId) {
     return res.status(400).send("All fields must be completed.");
   }
@@ -31,7 +30,6 @@ exports.getAllNotes = (req, res) => {
 
 exports.getNote = (req, res) => {
   const targetNote = notes.find((n) => String(n.id) === req.params.id);
-
   if (!targetNote) {
     return res.status(404).send("Note not found.");
   }
@@ -41,7 +39,6 @@ exports.getNote = (req, res) => {
 
 exports.updateNote = (req, res) => {
   const existingNote = notes.find((n) => n.id === req.params.id);
-
   if (!existingNote) {
     return res.status(404).send("Note not found.");
   }
@@ -74,7 +71,6 @@ exports.updateNote = (req, res) => {
 
 exports.deleteNote = (req, res) => {
   const noteToDelete = notes.find((n) => n.id === req.params.id);
-
   if (!noteToDelete) {
     return res.status(404).send("Note not found");
   }
