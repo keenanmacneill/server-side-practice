@@ -40,5 +40,12 @@
     "content": "Local population expressing concern about power outages and rising food prices. Monitor for potential unrest indicators.",
     "location": "Town Market District",
     "userId": "2"
+  },
+  {
+    "id": "7",
+    "title": "Key Leader Engagement – Mayor",
+    "content": "Discussed water infrastructure repairs, winter fuel shortages, and NGO coordination requirements.",
+    "location": "Lviv City Hall",
+    "userId": "1"
   }
 ]

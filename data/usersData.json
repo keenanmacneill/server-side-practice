@@ -2,21 +2,31 @@
   {
     "id": "1",
     "username": "alicia",
-    "passwordHash": "$2b$10$1vJmVq9kA3kTz3gLh5E7fOq2l1uT8gYp1y7z2KcQ1s3P0N9H8F2G"
+    "password": "$2b$10$1vJmVq9kA3kTz3gLh5E7fOq2l1uT8gYp1y7z2KcQ1s3P0N9H8F2G"
   },
   {
     "id": "2",
     "username": "bob",
-    "passwordHash": "$2b$10$8ZpM3xY9rT2uQ7a5nK6dEeJ1Vx0oWb4Lq3D8sYh2A7t9F6P4G3H"
+    "password": "$2b$10$8ZpM3xY9rT2uQ7a5nK6dEeJ1Vx0oWb4Lq3D8sYh2A7t9F6P4G3H"
   },
   {
     "id": "3",
     "username": "charlie",
-    "passwordHash": "$2b$10$9hF3tK7L2xP8Q1dY6rB5nC4Wm0sV7aJ2E3pT8uL9k6R5D1F0Zx"
+    "password": "$2b$10$9hF3tK7L2xP8Q1dY6rB5nC4Wm0sV7aJ2E3pT8uL9k6R5D1F0Zx"
   },
   {
     "id": "4",
     "username": "diana",
-    "passwordHash": "$2b$10$7JpQ3WnF2xZ8K5L1mR9T4uV6sB0aY3cD8H1P5kL7Q9F2X4G6E"
+    "password": "$2b$10$7JpQ3WnF2xZ8K5L1mR9T4uV6sB0aY3cD8H1P5kL7Q9F2X4G6E"
+  },
+  {
+    "id": "5",
+    "username": "ethan",
+    "password": "$2b$10$lNGdGaP4RLTrNdkOBFO1qOOrnKsr8Hhhk62yyYo065DYXa54In.FW"
+  },
+  {
+    "id": "5",
+    "username": "francis",
+    "password": "$2b$10$ia/rkwThAWHNF1IjK/IUze.lQkO74q7skdZeeKftVbdpKM2OtjHza"
   }
 ]

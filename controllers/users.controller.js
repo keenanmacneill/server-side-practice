@@ -1,18 +1,20 @@
 const path = require("path");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
 
 const filePath = path.join(__dirname, "../data/usersData.json");
 const users = require(filePath);
 
-exports.createUser = (req, res) => {
-  const { id, username, passwordHash } = req.body;
+exports.createUser = async (req, res) => {
+  const { id, username, password } = req.body;
 
-  if (!id || !username || !passwordHash) {
+  if (!id || !username || !password) {
     return res
       .status(400)
-      .send("'id', 'username', and 'passwordHash' fields are required.");
+      .send("'id', 'username', and 'password' fields are required.");
   }
 
+  req.body.password = await bcrypt.hash(password, 10);
   users.push(req.body);
 
   fs.writeFile(filePath, JSON.stringify(users, null, 2), (err) => {
