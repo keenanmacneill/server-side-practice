@@ -1,6 +1,6 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const requireAuth = require("../middleware/requireAuth");
+const requireAuth = require('../middleware/requireAuth');
 
 const {
   getNote,
@@ -8,12 +8,12 @@ const {
   createNote,
   updateNote,
   deleteNote,
-} = require("../controllers/notes.controller");
+} = require('../controllers/notes.controller');
 
-router.post("/", requireAuth, createNote);
-router.get("/", getAllNotes);
-router.get("/:id", getNote);
-router.patch("/:id", updateNote);
-router.delete("/:id", deleteNote);
+router.post('/', requireAuth, createNote);
+router.get('/', getAllNotes);
+router.get('/:id', getNote);
+router.patch('/:id', updateNote);
+router.delete('/:id', deleteNote);
 
 module.exports = router;

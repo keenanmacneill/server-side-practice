@@ -1,4 +1,4 @@
-const sessions = require("../store/sessions.store");
+const sessions = require('../store/sessions.store');
 
 function requireAuth(req, res, next) {
   const sessionId = req.cookies.sessionId;
@@ -8,7 +8,7 @@ function requireAuth(req, res, next) {
   console.log(sessions);
 
   if (!session) {
-    return res.status(401).send("Unauthorized");
+    return res.status(401).send('Unauthorized');
   }
 
   req.user = session;
