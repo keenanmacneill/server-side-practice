@@ -1,6 +1,10 @@
+// supertest sends HTTP requests to the Express app in tests
 const request = require('supertest');
+
+// standard import, to create spies in beforeEach
 const fs = require('fs');
 
+// global test variables set during beforeEach
 let server;
 let writeSpy;
 let appendSpy;
@@ -8,15 +12,19 @@ let unlinkSpy;
 
 describe('Notes API', () => {
   beforeEach(() => {
+    // reset Jest module cache so each test gets fresh imports
     jest.resetModules();
 
+    // mock notes data so tests do not use the real JSON file
     jest.doMock('../data/notesData.json', () => [
       { id: '1', title: 'alice', content: 'hash1', location: 'somewhere', userId: '1' },
       { id: '2', title: 'billy', content: 'hash2', location: 'somewhere-else', userId: '2' },
     ]);
 
+    // mock auth for protected routes during tests
     jest.doMock('../middleware/requireAuth', () => (req, res, next) => next());
 
+    // spy on fs methods and replace them with successful callback behavior
     writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation((filePath, data, callback) => {
       if (callback) callback(null);
     });
@@ -29,10 +37,12 @@ describe('Notes API', () => {
       if (callback) callback(null);
     });
 
+    // require the server after mocks to use mocked dependencies
     server = require('../server');
   });
 
   afterEach(() => {
+    // restore original fs methods and stop mocking the notes data module
     writeSpy.mockRestore();
     appendSpy.mockRestore();
     unlinkSpy.mockRestore();
