@@ -1,7 +1,7 @@
-// supertest sends HTTP requests to the Express app in tests
+// supertest sends HTTP requests to the app
 const request = require('supertest');
 
-// standard import, to create spies in beforeEach
+// standard to import at top, used to create spies in beforeEach
 const fs = require('fs');
 
 // global test variables set during beforeEach
@@ -24,7 +24,8 @@ describe('Notes API', () => {
     // mock auth for protected routes during tests
     jest.doMock('../middleware/requireAuth', () => (req, res, next) => next());
 
-    // spy on fs methods and replace them with successful callback behavior
+    // spy on fs methods, include successful callback behavior
+    // mockImplementation must match params of mocked method
     writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation((filePath, data, callback) => {
       if (callback) callback(null);
     });
@@ -37,7 +38,7 @@ describe('Notes API', () => {
       if (callback) callback(null);
     });
 
-    // require the server after mocks to use mocked dependencies
+    // import the server after mocks so that it inits with the mocked dependencies
     server = require('../server');
   });
 
