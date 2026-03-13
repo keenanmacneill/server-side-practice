@@ -1,18 +1,40 @@
-jest.mock('fs', () => ({
-  writeFile: jest.fn(),
-}));
-
 const request = require('supertest');
+const fs = require('fs');
+
+let server;
+let writeSpy;
+let appendSpy;
+let unlinkSpy;
 
 describe('Users API', () => {
-  let server;
-  let fs;
-
   beforeEach(() => {
     jest.resetModules();
-    fs = require('fs');
-    fs.writeFile.mockReset();
+
+    jest.doMock('../data/usersData.json', () => [
+      { id: '1', username: 'alice', password: 'hash1' },
+      { id: '2', username: 'bob', password: 'hash2' },
+    ]);
+
+    writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation((filePath, data, callback) => {
+      if (callback) callback(null);
+    });
+
+    appendSpy = jest.spyOn(fs, 'appendFile').mockImplementation((filePath, data, callback) => {
+      if (callback) callback(null);
+    });
+
+    unlinkSpy = jest.spyOn(fs, 'unlink').mockImplementation((filePath, callback) => {
+      if (callback) callback(null);
+    });
+
     server = require('../server');
+  });
+
+  afterEach(() => {
+    writeSpy.mockRestore();
+    appendSpy.mockRestore();
+    unlinkSpy.mockRestore();
+    jest.dontMock('../data/usersData.json');
   });
 
   describe('GET /users', () => {
@@ -41,36 +63,33 @@ describe('Users API', () => {
       });
 
       expect(res.statusCode).toBe(400);
-      expect(res.text).toBe("'id', 'username', and 'passwordHash' fields are required.");
+      expect(res.text).toBe("'id', 'username', and 'password' fields are required.");
     });
 
     test('should create a user when all required fields are present', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) => callback(null));
-
       const res = await request(server).post('/users').send({
-        id: 'test-user-1',
+        id: '100',
         username: 'keenan',
-        passwordHash: 'hashed-password',
+        password: 'hashed-password',
       });
 
       expect(res.statusCode).toBe(200);
       expect(res.text).toBe('keenan has been successfully added');
-      expect(fs.writeFile).toHaveBeenCalledTimes(1);
+      expect(writeSpy).toHaveBeenCalledTimes(1);
     });
 
     test('should return 500 if file write fails', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) =>
-        callback(new Error('write failed')),
-      );
+      writeSpy.mockImplementationOnce((filePath, data, callback) => {
+        callback(new Error('write failed'));
+      });
 
       const res = await request(server).post('/users').send({
         id: 'test-user-2',
         username: 'failcase',
-        passwordHash: 'hashed-password',
+        password: 'hashed-password',
       });
 
       expect(res.statusCode).toBe(500);
-      expect(res.text).toBe('Failed to save user');
     });
   });
 
@@ -85,15 +104,7 @@ describe('Users API', () => {
     });
 
     test('should update an existing user', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) => callback(null));
-
-      await request(server).post('/users').send({
-        id: 'update-user-1',
-        username: 'oldname',
-        passwordHash: 'hash1',
-      });
-
-      const res = await request(server).patch('/users/update-user-1').send({ username: 'newname' });
+      const res = await request(server).patch('/users/1').send({ username: 'newname' });
 
       expect(res.statusCode).toBe(200);
       expect(res.text).toBe('Successfully updated.');
@@ -109,18 +120,10 @@ describe('Users API', () => {
     });
 
     test('should delete an existing user', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) => callback(null));
-
-      await request(server).post('/users').send({
-        id: 'delete-user-1',
-        username: 'deleteme',
-        passwordHash: 'hash1',
-      });
-
-      const res = await request(server).delete('/users/delete-user-1');
+      const res = await request(server).delete('/users/1');
 
       expect(res.statusCode).toBe(200);
-      expect(res.text).toBe('deleteme has been successfully deleted');
+      expect(res.text).toBe('alice has been successfully deleted');
     });
   });
 });

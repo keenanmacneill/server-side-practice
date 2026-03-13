@@ -1,7 +1,42 @@
 const request = require('supertest');
-const server = require('../server');
+const fs = require('fs');
+
+let server;
+let writeSpy;
+let appendSpy;
+let unlinkSpy;
 
 describe('Server', () => {
+  beforeEach(() => {
+    jest.resetModules();
+
+    jest.doMock('../data/usersData.json', () => [
+      { id: '1', username: 'alice', password: 'hash1' },
+      { id: '2', username: 'bob', password: 'hash2' },
+    ]);
+
+    writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation((filePath, data, callback) => {
+      if (callback) callback(null);
+    });
+
+    appendSpy = jest.spyOn(fs, 'appendFile').mockImplementation((filePath, data, callback) => {
+      if (callback) callback(null);
+    });
+
+    unlinkSpy = jest.spyOn(fs, 'unlink').mockImplementation((filePath, callback) => {
+      if (callback) callback(null);
+    });
+
+    server = require('../server');
+  });
+
+  afterEach(() => {
+    writeSpy.mockRestore();
+    appendSpy.mockRestore();
+    unlinkSpy.mockRestore();
+    jest.dontMock('../data/usersData.json');
+  });
+
   test('GET / responds with 200 and health message', async () => {
     const res = await request(server).get('/');
 

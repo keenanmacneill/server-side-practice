@@ -1,18 +1,42 @@
-jest.mock('fs', () => ({
-  writeFile: jest.fn(),
-}));
-
 const request = require('supertest');
+const fs = require('fs');
+
+let server;
+let writeSpy;
+let appendSpy;
+let unlinkSpy;
 
 describe('Notes API', () => {
-  let server;
-  let fs;
-
   beforeEach(() => {
     jest.resetModules();
-    fs = require('fs');
-    fs.writeFile.mockReset();
+
+    jest.doMock('../data/notesData.json', () => [
+      { id: '1', title: 'alice', content: 'hash1', location: 'somewhere', userId: '1' },
+      { id: '2', title: 'billy', content: 'hash2', location: 'somewhere-else', userId: '2' },
+    ]);
+
+    jest.doMock('../middleware/requireAuth', () => (req, res, next) => next());
+
+    writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation((filePath, data, callback) => {
+      if (callback) callback(null);
+    });
+
+    appendSpy = jest.spyOn(fs, 'appendFile').mockImplementation((filePath, data, callback) => {
+      if (callback) callback(null);
+    });
+
+    unlinkSpy = jest.spyOn(fs, 'unlink').mockImplementation((filePath, callback) => {
+      if (callback) callback(null);
+    });
+
     server = require('../server');
+  });
+
+  afterEach(() => {
+    writeSpy.mockRestore();
+    appendSpy.mockRestore();
+    unlinkSpy.mockRestore();
+    jest.dontMock('../data/notesData.json');
   });
 
   describe('GET /notes', () => {
@@ -36,7 +60,7 @@ describe('Notes API', () => {
   describe('POST /notes', () => {
     test('should return 400 if required fields are missing', async () => {
       const res = await request(server).post('/notes').send({
-        id: 'note-1',
+        id: '3',
         title: 'Test title',
       });
 
@@ -45,8 +69,6 @@ describe('Notes API', () => {
     });
 
     test('should create a note when all fields are present', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) => callback(null));
-
       const res = await request(server).post('/notes').send({
         id: 'note-1',
         title: 'Test note',
@@ -57,11 +79,11 @@ describe('Notes API', () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.text).toBe("'Test note' at Laptop has been successfully added.");
-      expect(fs.writeFile).toHaveBeenCalledTimes(1);
+      expect(writeSpy).toHaveBeenCalledTimes(1);
     });
 
     test('should return 500 if file write fails', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) =>
+      writeSpy.mockImplementation((filePath, data, callback) =>
         callback(new Error('write failed')),
       );
 
@@ -89,20 +111,12 @@ describe('Notes API', () => {
     });
 
     test('should update an existing note', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) => callback(null));
+      writeSpy.mockImplementation((filePath, data, callback) => callback(null));
 
-      await request(server).post('/notes').send({
-        id: 'note-update-1',
-        title: 'Old title',
-        content: 'Old content',
-        location: 'Home',
-        userId: 'user-1',
-      });
-
-      const res = await request(server).patch('/notes/note-update-1').send({ title: 'New title' });
+      const res = await request(server).patch('/notes/1').send({ title: 'New title' });
 
       expect(res.statusCode).toBe(200);
-      expect(res.text).toBe('Successfully updated New title at Home');
+      expect(res.text).toBe('Successfully updated New title at somewhere');
     });
   });
 
@@ -115,20 +129,12 @@ describe('Notes API', () => {
     });
 
     test('should delete an existing note', async () => {
-      fs.writeFile.mockImplementation((filePath, data, callback) => callback(null));
+      writeSpy.mockImplementation((filePath, data, callback) => callback(null));
 
-      await request(server).post('/notes').send({
-        id: 'note-delete-1',
-        title: 'Delete me',
-        content: 'content',
-        location: 'Desk',
-        userId: 'user-1',
-      });
-
-      const res = await request(server).delete('/notes/note-delete-1');
+      const res = await request(server).delete('/notes/1');
 
       expect(res.statusCode).toBe(200);
-      expect(res.text).toBe("'Delete me' at Desk was successfully deleted");
+      expect(res.text).toBe("'alice' at somewhere was successfully deleted");
     });
   });
 });
